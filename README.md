@@ -1,5 +1,5 @@
 
-  chmod 755 script.sh
+  chmod 755 install.sh
 
 
 
