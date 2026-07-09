@@ -1,4 +1,4 @@
-
+lsblk for hdd name  change if neede in the scrip
   chmod 755 install.sh
 
 
