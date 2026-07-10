@@ -1,4 +1,9 @@
-lsblk for hdd name  change if neede in the scrip
+24.04 ubuntu 
+
+lsblk 
+
+for hdd name  change if neede in the scrip
+
   chmod 755 install.sh
 
 
