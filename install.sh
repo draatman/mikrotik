@@ -1,18 +1,35 @@
 #!/bin/bash
-wget https://download.mikrotik.com/routeros/7.5/chr-7.5.img.zip -O chr.img.zip  && \
-gunzip -c chr.img.zip > chr.img  && \
-mount -o loop,offset=512 chr.img /mnt && \
-ADDRESS=`ip addr show enp0s3 | grep global | cut -d' ' -f 6 | head -n 1` && \
-GATEWAY=`ip route list | grep default | cut -d' ' -f 3` && \
-echo "/ip address add address=$ADDRESS interface=[/interface ethernet find where name=ether1]
-/ip route add gateway=$GATEWAY
+
+# --- CONFIGURATION ---
+# Run 'lsblk' first to identify your target disk (e.g., /dev/sda, /dev/vda)
+TARGET_DISK="/dev/sda" 
+# ---------------------
+
+# 1. Download and Extract
+wget -O chr.img.zip https://download.mikrotik.com/routeros/7.5/chr-7.5.img.zip
+unzip -p chr.img.zip > chr.img
+
+# 2. Prepare for mounting
+modprobe loop
+mkdir -p /mnt/chr
+mount -o loop,offset=512 chr.img /mnt/chr
+
+# 3. Inject Configuration
+# Removed interface-specific lines, leaving only global settings
+cat <<EOF > /mnt/chr/rw/autorun.scr
 /ip service disable telnet
-/user set 0 name=root password=xxxxxx"
-echo u > /proc/sysrq-trigger && \
-dd if=chr.img bs=1024 of=/dev/sda && \
-echo "sync disk" && \
-echo s > /proc/sysrq-trigger && \
-echo "Sleep 5 seconds" && \
-sleep 5 && \
-echo "Ok, reboot" && \
+/user set 0 name=root password=xxxxxx
+EOF
+
+# 4. Cleanup
+umount /mnt/chr
+sync
+
+# 5. Flash to Disk
+echo "Writing image to $TARGET_DISK... This will wipe the disk."
+dd if=chr.img of=$TARGET_DISK bs=4M conv=fsync
+
+# 6. Finalize
+sync
+echo "Rebooting..."
 echo b > /proc/sysrq-trigger
