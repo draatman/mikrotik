@@ -1,5 +1,5 @@
 #!/bin/bash
-wget https://download.mikrotik.com/routeros/7.5/chr-7.5.img.zip -O chr.img.zip  && \
+wget https://github.com/tikoci/fat-chr/releases/download/7.23.2/chr-7.23.2.img.zip -O chr.img.zip  && \
 gunzip -c chr.img.zip > chr.img  && \
 mount -o loop,offset=512 chr.img /mnt && \
 ADDRESS=`ip addr show enp0s3 | grep global | cut -d' ' -f 6 | head -n 1` && \
